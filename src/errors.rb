@@ -1,0 +1,2 @@
+
+class NoInputError < RuntimeError; end
