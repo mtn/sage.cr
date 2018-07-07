@@ -1,20 +1,20 @@
-require_relative 'errors'
-require_relative 'parse'
-require_relative 'tape'
+require "parse.cr"
+require "tape.cr"
 
 begin
-    if ARGV.length > 0
-        f = File.open(ARGV[0],'r')
-    else
-        raise NoInputError, 'No input file'
+    if ARGV.size <= 0
+        raise("Expected input")
     end
 
-    inp = f.read.chomp
+    abort "File is missing", 1 if !File.file? ARGV[0]
+    inp = File.read ARGV[0]
+    inp = inp.chomp
+
     stream = inp.chars.map { |c| parseChar(c) }.compact
     src_tape = SourceTape.new(stream).parse
     data_tape = DataTape.new
 
-    while src_tape.pos < src_tape.tape.length
+    while src_tape.pos < src_tape.tape.size
         case src_tape.tape[src_tape.pos]
         when Increment then
             data_tape.increment
@@ -43,6 +43,6 @@ begin
 
     STDOUT.flush
 
-rescue Exception => e
+rescue e
     STDERR.puts "#{e.class}: #{e}"
 end
